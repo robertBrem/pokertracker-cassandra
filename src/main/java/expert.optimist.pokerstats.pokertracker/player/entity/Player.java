@@ -10,12 +10,12 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "players", schema = "demo@cassandra_pu")
+@Table(name = "players", schema = "pokertracker@cassandra")
 @NamedQueries(@NamedQuery(name = "Player.findAll", query = "SELECT p FROM Player p"))
 public class Player {
 
     @Id
-    @TableGenerator(name = "id_gen", allocationSize = 5)
+    @TableGenerator(name = "id_gen", allocationSize = 1)
     @GeneratedValue(generator = "id_gen", strategy = GenerationType.TABLE)
     @Column(name = "id")
     private Integer id;

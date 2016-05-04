@@ -28,7 +28,7 @@ public class PlayerService {
                 configOverrides.put("kundera.nodes", env.get(envName));
             }
         }
-        emf = Persistence.createEntityManagerFactory("cassandra_pu", configOverrides);
+        emf = Persistence.createEntityManagerFactory("cassandra", configOverrides);
         em = emf.createEntityManager();
     }
 
