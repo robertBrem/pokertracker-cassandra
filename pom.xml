@@ -29,6 +29,11 @@
             <version>0.0.1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.airhacks</groupId>
+            <artifactId>porcupine</artifactId>
+            <version>0.0.4</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>pokertracker</finalName>

@@ -11,6 +11,7 @@
             <property name="kundera.dialect" value="cassandra"/>
             <property name="kundera.client.lookup.class"
                       value="com.impetus.client.cassandra.thrift.ThriftClientFactory"/>
+            <property name="kundera.ddl.auto.prepare" value="create"/>
         </properties>
     </persistence-unit>
 </persistence>
