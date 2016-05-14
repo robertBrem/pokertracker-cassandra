@@ -31,24 +31,29 @@ public class AccountService {
         this.em = emCreator.getEm();
     }
 
+    public GenericEntity<List<AccountPosition>> findByPlayerIdAsGenericEntities(Long playerId) {
+        return new GenericEntity<List<AccountPosition>>(findByPlayerId(playerId)) {
+        };
+    }
+
     /**
      * Named Queries with parameters are not supported in Kundera for now.
      */
-    public GenericEntity<List<AccountPosition>> findByPlayerId(Long playerId) {
+    public List<AccountPosition> findByPlayerId(Long playerId) {
         Player player = playerService.find(playerId);
 
-        List<Map<String, Object>> nativeResult = em.createNativeQuery("SELECT * FROM \"ACCOUNT_POSITIONS\" WHERE \"PLAYER_ID\" = " + playerId).getResultList();
+        List<?> nativeQuery = em.createNativeQuery("SELECT \"ACCOUNT_POSITION_ID\", \"AMOUNT\", \"CURRENCY\", \"DATE\", \"CREATION\" FROM \"ACCOUNT_POSITIONS\" WHERE \"PLAYER_ID\" = " + playerId).getResultList();
+        List<Map<String, Object>> nativeResult = (List<Map<String, Object>>) nativeQuery;
         List<AccountPosition> result = new ArrayList<>();
         for (Map<String, Object> position : nativeResult) {
             Long accountPositionId = (Long) position.get("ACCOUNT_POSITION_ID");
             Long amount = (Long) position.get("AMOUNT");
             String currency = (String) position.get("CURRENCY");
+            Date date = (Date) position.get("DATE");
             Date creation = (Date) position.get("CREATION");
-            result.add(new AccountPosition(accountPositionId, player, amount, currency, creation));
+            result.add(new AccountPosition(accountPositionId, player, amount, currency, date, creation));
         }
-
-        return new GenericEntity<List<AccountPosition>>(result) {
-        };
+        return result;
     }
 
     public AccountPosition findById(Long id) {
@@ -59,6 +64,7 @@ public class AccountService {
         Player player = playerService.find(playerId);
         position.setPlayer(player);
         position.setTimestamp(new Date());
+        position.setDate(new Date());
         return em.merge(position);
     }
 

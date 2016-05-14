@@ -6,6 +6,8 @@ import expert.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import expert.optimist.pokerstats.pokertracker.player.entity.Player;
 
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
@@ -72,8 +74,21 @@ public class PlayerResource {
     @GET
     @Path("{id}/accountpositions")
     public void getAccountPositions(@Suspended AsyncResponse response, @PathParam("id") Long id) {
-        GenericEntity<List<AccountPosition>> positions = accountService.findByPlayerId(id);
+        GenericEntity<List<AccountPosition>> positions = accountService.findByPlayerIdAsGenericEntities(id);
         response.resume(positions);
+    }
+
+    @GET
+    @Path("{id}/balance")
+    public void getBalance(@Suspended AsyncResponse response, @PathParam("id") Long id) {
+        List<AccountPosition> positions = accountService.findByPlayerId(id);
+        Long balance = positions.stream()
+                .map(ap -> ap.getAmount())
+                .reduce(0L, Long::sum);
+        JsonObject balanceJson = Json.createObjectBuilder()
+                .add("value", balance)
+                .build();
+        response.resume(balanceJson);
     }
 
     @GET

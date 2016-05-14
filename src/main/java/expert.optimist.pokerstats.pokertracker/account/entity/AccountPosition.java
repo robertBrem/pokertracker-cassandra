@@ -37,6 +37,10 @@ public class AccountPosition {
     @Column(name = "CURRENCY")
     private String currency;
 
+    @Column(name = "DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date;
+
     @Column(name = "CREATION")
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;
