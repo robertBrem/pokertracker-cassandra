@@ -87,6 +87,7 @@ public class PlayerResource {
                 .reduce(0L, Long::sum);
         JsonObject balanceJson = Json.createObjectBuilder()
                 .add("value", balance)
+                .add("currency", "CHF")
                 .build();
         response.resume(balanceJson);
     }
