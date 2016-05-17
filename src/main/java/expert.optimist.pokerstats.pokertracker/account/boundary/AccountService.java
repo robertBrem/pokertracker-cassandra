@@ -37,7 +37,7 @@ public class AccountService {
         };
     }
 
-    public LinkedHashMap<Date, Long> findByPlayerIdHisotry(Long playerId) {
+    public LinkedHashMap<Date, Long> findByPlayerIdHistory(Long playerId) {
         List<AccountPosition> positions = findByPlayerId(playerId);
         Date start = positions.stream()
                 .map(AccountPosition::getDate)
@@ -67,6 +67,22 @@ public class AccountService {
         }
 
         return history;
+    }
+
+    public LinkedHashMap<Date, Long> findByPlayerIdHistorySummedUp(Long playerId) {
+        LinkedHashMap<Date, Long> history = findByPlayerIdHistory(playerId);
+        LinkedHashMap<Date, Long> historySummedUp = new LinkedHashMap<>();
+        Long currentTotalBalance = 0L;
+        for (Date date : history.keySet()) {
+            Long dateBalance = history.get(date);
+            if (dateBalance == null || dateBalance.equals(0L)) {
+                historySummedUp.put(date, null);
+            } else {
+                currentTotalBalance += dateBalance;
+                historySummedUp.put(date, currentTotalBalance);
+            }
+        }
+        return historySummedUp;
     }
 
     /**

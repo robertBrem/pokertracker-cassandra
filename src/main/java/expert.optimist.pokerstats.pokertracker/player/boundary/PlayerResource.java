@@ -6,9 +6,7 @@ import expert.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import expert.optimist.pokerstats.pokertracker.player.entity.Player;
 
 import javax.inject.Inject;
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
+import javax.json.*;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
@@ -83,15 +81,24 @@ public class PlayerResource {
 
     @GET
     @Path("{id}/accounthistory")
-    public void getAccountHistory(@Suspended AsyncResponse response, @PathParam("id") Long id) {
-        LinkedHashMap<Date, Long> history = accountService.findByPlayerIdHisotry(id);
+    public void getAccountHistory(@Suspended AsyncResponse response, @PathParam("id") Long id, @QueryParam("summedUp") Boolean summedUp) {
+        LinkedHashMap<Date, Long> history;
+        if (summedUp != null && summedUp) {
+            history = accountService.findByPlayerIdHistorySummedUp(id);
+        } else {
+            history = accountService.findByPlayerIdHistory(id);
+        }
 
         JsonArrayBuilder historyAsJson = Json.createArrayBuilder();
         for (Date date : history.keySet()) {
-            JsonObject entry = Json.createObjectBuilder()
-                    .add("date", date.toString())
-                    .add("balance", history.get(date))
-                    .build();
+            JsonObjectBuilder entryBuilder = Json.createObjectBuilder();
+            entryBuilder.add("date", date.toString());
+            if (history.get(date) == null) {
+                entryBuilder.add("balance", JsonValue.NULL);
+            } else {
+                entryBuilder.add("balance", history.get(date));
+            }
+            JsonObject entry = entryBuilder.build();
             historyAsJson.add(entry);
         }
         response.resume(historyAsJson.build());
