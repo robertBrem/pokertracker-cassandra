@@ -10,10 +10,11 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.ws.rs.core.GenericEntity;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Stateless
 public class AccountService {
@@ -34,6 +35,38 @@ public class AccountService {
     public GenericEntity<List<AccountPosition>> findByPlayerIdAsGenericEntities(Long playerId) {
         return new GenericEntity<List<AccountPosition>>(findByPlayerId(playerId)) {
         };
+    }
+
+    public LinkedHashMap<Date, Long> findByPlayerIdHisotry(Long playerId) {
+        List<AccountPosition> positions = findByPlayerId(playerId);
+        Date start = positions.stream()
+                .map(AccountPosition::getDate)
+                .min(Date::compareTo)
+                .get();
+        Date end = positions.stream()
+                .map(AccountPosition::getDate)
+                .max(Date::compareTo)
+                .get();
+        Map<LocalDateTime, List<AccountPosition>> groupByDate = positions.stream()
+                .collect(Collectors.groupingBy(AccountPosition::getMinuteRounded));
+
+        LinkedHashMap<Date, Long> history = new LinkedHashMap<>();
+        LocalDateTime startAsLDT = LocalDateTime.ofInstant(start.toInstant(), ZoneId.systemDefault());
+        LocalDateTime endAsLDT = LocalDateTime.ofInstant(end.toInstant(), ZoneId.systemDefault());
+        for (LocalDateTime current = startAsLDT; !current.isAfter(endAsLDT); current = current.plusMinutes(1L)) {
+            LocalDateTime minuteRounded = current.truncatedTo(ChronoUnit.MINUTES);
+            List<AccountPosition> positionsForMinute = groupByDate.get(minuteRounded);
+            if (positionsForMinute == null) {
+                positionsForMinute = new ArrayList<>();
+            }
+            Long balance = positionsForMinute.stream()
+                    .map(AccountPosition::getAmount)
+                    .reduce(0L, Long::sum);
+            Date asDate = Date.from(minuteRounded.atZone(ZoneId.systemDefault()).toInstant());
+            history.put(asDate, balance);
+        }
+
+        return history;
     }
 
     /**

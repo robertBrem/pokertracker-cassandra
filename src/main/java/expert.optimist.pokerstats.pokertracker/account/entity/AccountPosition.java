@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Getter
@@ -44,4 +47,10 @@ public class AccountPosition {
     @Column(name = "CREATION")
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;
+
+    public LocalDateTime getMinuteRounded() {
+        Date date = getDate();
+        LocalDateTime asLDT = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        return asLDT.truncatedTo(ChronoUnit.MINUTES);
+    }
 }

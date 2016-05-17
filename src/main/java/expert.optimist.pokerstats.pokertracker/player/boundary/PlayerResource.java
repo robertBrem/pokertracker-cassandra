@@ -7,12 +7,15 @@ import expert.optimist.pokerstats.pokertracker.player.entity.Player;
 
 import javax.inject.Inject;
 import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.*;
 import java.net.URI;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -79,11 +82,27 @@ public class PlayerResource {
     }
 
     @GET
+    @Path("{id}/accounthistory")
+    public void getAccountHistory(@Suspended AsyncResponse response, @PathParam("id") Long id) {
+        LinkedHashMap<Date, Long> history = accountService.findByPlayerIdHisotry(id);
+
+        JsonArrayBuilder historyAsJson = Json.createArrayBuilder();
+        for (Date date : history.keySet()) {
+            JsonObject entry = Json.createObjectBuilder()
+                    .add("date", date.toString())
+                    .add("balance", history.get(date))
+                    .build();
+            historyAsJson.add(entry);
+        }
+        response.resume(historyAsJson.build());
+    }
+
+    @GET
     @Path("{id}/balance")
     public void getBalance(@Suspended AsyncResponse response, @PathParam("id") Long id) {
         List<AccountPosition> positions = accountService.findByPlayerId(id);
         Long balance = positions.stream()
-                .map(ap -> ap.getAmount())
+                .map(AccountPosition::getAmount)
                 .reduce(0L, Long::sum);
         JsonObject balanceJson = Json.createObjectBuilder()
                 .add("value", balance)
