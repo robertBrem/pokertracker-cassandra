@@ -6,14 +6,14 @@ import expert.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import expert.optimist.pokerstats.pokertracker.player.entity.Player;
 
 import javax.inject.Inject;
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.*;
 import java.net.URI;
-import java.util.Date;
-import java.util.LinkedHashMap;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -36,7 +36,7 @@ public class PlayerResource {
     @GET
     public void getAll(@Suspended AsyncResponse response) {
         CompletableFuture
-                .supplyAsync(service::getAllPlayersFromDB, threadPool)
+                .supplyAsync(service::getAllPlayersAsGenericEntity, threadPool)
                 .thenAccept(response::resume);
     }
 
@@ -74,35 +74,23 @@ public class PlayerResource {
 
     @GET
     @Path("{id}/accountpositions")
-    public void getAccountPositions(@Suspended AsyncResponse response, @PathParam("id") Long id) {
+    public void getAccountPositionsForPlayer(@Suspended AsyncResponse response, @PathParam("id") Long id) {
         GenericEntity<List<AccountPosition>> positions = accountService.findByPlayerIdAsGenericEntities(id);
         response.resume(positions);
     }
 
     @GET
     @Path("{id}/accounthistory")
-    public void getAccountHistory(@Suspended AsyncResponse response, @PathParam("id") Long id, @QueryParam("summedUp") Boolean summedUp) {
-        LinkedHashMap<Date, Long> history;
-        if (summedUp != null && summedUp) {
-            history = accountService.findByPlayerIdHistorySummedUp(id);
-        } else {
-            history = accountService.findByPlayerIdHistory(id);
-        }
-
-        JsonArrayBuilder historyAsJson = Json.createArrayBuilder();
-        for (Date date : history.keySet()) {
-            JsonObjectBuilder entryBuilder = Json.createObjectBuilder();
-            entryBuilder.add("date", date.toString());
-            if (history.get(date) == null) {
-                entryBuilder.add("balance", JsonValue.NULL);
-            } else {
-                entryBuilder.add("balance", history.get(date));
-            }
-            JsonObject entry = entryBuilder.build();
-            historyAsJson.add(entry);
-        }
-        response.resume(historyAsJson.build());
+    public void getAccountHistoryForPlayer(@Suspended AsyncResponse response, @PathParam("id") Long id, @QueryParam("summedUp") Boolean summedUp) {
+        response.resume(accountService.getHistoryForPlayerAsJson(id, summedUp, ChronoUnit.MINUTES));
     }
+
+    @GET
+    @Path("accounthistory")
+    public void getAccountHistory(@Suspended AsyncResponse response, @QueryParam("summedUp") Boolean summedUp) {
+        response.resume(accountService.getHistoryAsJsonArray(summedUp, ChronoUnit.MINUTES));
+    }
+
 
     @GET
     @Path("{id}/balance")

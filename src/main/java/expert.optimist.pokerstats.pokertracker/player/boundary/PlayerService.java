@@ -39,10 +39,14 @@ public class PlayerService {
         this.em.remove(reference);
     }
 
-    public GenericEntity<List<Player>> getAllPlayersFromDB() {
-        List<Player> players = em.createNamedQuery("Players.findAll", Player.class).getResultList();
+    public GenericEntity<List<Player>> getAllPlayersAsGenericEntity() {
+        List<Player> players = getAllPlayers();
         return new GenericEntity<List<Player>>(players) {
         };
+    }
+
+    public List<Player> getAllPlayers() {
+        return em.createNamedQuery("Players.findAll", Player.class).getResultList();
     }
 
 }

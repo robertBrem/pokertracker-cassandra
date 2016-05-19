@@ -28,4 +28,8 @@ public class Player {
     @Column(name = "LAST_NAME")
     private String lastName;
 
+    public String getFormattedName() {
+        return firstName + " " + lastName;
+    }
+
 }
