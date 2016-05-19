@@ -87,8 +87,12 @@ public class PlayerResource {
 
     @GET
     @Path("accounthistory")
-    public void getAccountHistory(@Suspended AsyncResponse response, @QueryParam("summedUp") Boolean summedUp) {
-        response.resume(accountService.getHistoryAsJsonArray(summedUp, ChronoUnit.MINUTES));
+    public void getAccountHistory(@Suspended AsyncResponse response, @QueryParam("summedUp") Boolean summedUp, @QueryParam("timeUnit") String timeUnitText) {
+        ChronoUnit timeUnit = ChronoUnit.MINUTES;
+        if (timeUnitText != null && !timeUnitText.isEmpty()) {
+            timeUnit = ChronoUnit.valueOf(timeUnitText);
+        }
+        response.resume(accountService.getHistoryAsJsonArray(summedUp, timeUnit));
     }
 
 

@@ -82,7 +82,7 @@ public class AccountService {
         LinkedHashMap<Date, Long> history = new LinkedHashMap<>();
         LocalDateTime startAsLDT = LocalDateTime.ofInstant(start.toInstant(), ZoneId.systemDefault()).truncatedTo(groupUnit);
         LocalDateTime endAsLDT = LocalDateTime.ofInstant(end.toInstant(), ZoneId.systemDefault()).truncatedTo(groupUnit);
-        for (LocalDateTime current = startAsLDT; !current.isAfter(endAsLDT); current = current.plusMinutes(1L)) {
+        for (LocalDateTime current = startAsLDT; !current.isAfter(endAsLDT); current = current.plus(1L, groupUnit)) {
             LocalDateTime groupUnitRounded = current.truncatedTo(groupUnit);
             List<AccountPosition> positionsForGroupUnit = groupByDate.get(groupUnitRounded);
             if (positionsForGroupUnit == null) {
