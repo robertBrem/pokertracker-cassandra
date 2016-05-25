@@ -1,4 +1,4 @@
-package expert.optimist.pokerstats.pokertracker;
+package com.optimist.pokerstats.pokertracker;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
