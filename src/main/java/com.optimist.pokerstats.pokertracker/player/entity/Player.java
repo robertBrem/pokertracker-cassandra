@@ -9,9 +9,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 @NoArgsConstructor
 @Getter
 @Setter
@@ -21,6 +25,7 @@ public class Player {
     private String firstName;
     private String lastName;
 
+    @XmlTransient
     private final List<CoreEvent> changes = new ArrayList<>();
 
     public Player(List<CoreEvent> events) {
