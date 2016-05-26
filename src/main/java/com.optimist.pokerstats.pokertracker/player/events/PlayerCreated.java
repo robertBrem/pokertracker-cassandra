@@ -1,11 +1,9 @@
 package com.optimist.pokerstats.pokertracker.player.events;
 
-import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+public class PlayerCreated extends PlayerEvent {
 
-@Getter
-@AllArgsConstructor
-public class PlayerCreated implements CoreEvent {
-    private final Long id;
+    public PlayerCreated(Long id) {
+        super(id);
+    }
+
 }

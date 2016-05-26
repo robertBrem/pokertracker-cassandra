@@ -1,6 +1,8 @@
 package com.optimist.pokerstats.pokertracker.player.boundary;
 
 import com.airhacks.porcupine.execution.boundary.Dedicated;
+import com.optimist.pokerstats.pokertracker.account.boundary.AccountService;
+import com.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import com.optimist.pokerstats.pokertracker.player.entity.Player;
 
 import javax.inject.Inject;
@@ -22,6 +24,9 @@ public class PlayerResource {
 
     @Inject
     PlayerService service;
+
+    @Inject
+    AccountService accountPositionService;
 
     @Inject
     @Dedicated
@@ -54,24 +59,29 @@ public class PlayerResource {
         response.resume(service.find(id));
     }
 
-//    @PUT
-//    @Path("{id}")
-//    public void update(@Suspended AsyncResponse response, @Context UriInfo info, @PathParam("id") Long id, Player player) {
-//        player.setId(id);
-//        Player saved = service.save(player);
-//        URI uri = info.getAbsolutePathBuilder().build();
-//        response.resume(Response.ok(uri).entity(saved).build());
-//    }
-//
-//    @POST
-//    @Path("{id}")
-//    public void createAccountPoisition(@Suspended AsyncResponse response, @Context UriInfo info, @PathParam("id") Long id, AccountPosition position) {
-//        AccountPosition saved = accountService.save(position, id);
-//        long possitionId = saved.getId();
-//        URI uri = info.getAbsolutePathBuilder().path("/accountpositions/" + possitionId).build();
-//        response.resume(Response.created(uri).entity(saved).build());
-//    }
-//
+    @PUT
+    @Path("{id}")
+    public void update(@Suspended AsyncResponse response, @Context UriInfo info, @PathParam("id") Long id, Player player) {
+        player.setId(id);
+        if (player.getFirstName() != null) {
+            player = service.changeFirstName(player.getId(), player.getFirstName());
+        }
+        if (player.getLastName() != null) {
+            player = service.changeLastName(player.getId(), player.getLastName());
+        }
+        URI uri = info.getAbsolutePathBuilder().build();
+        response.resume(Response.ok(uri).entity(player).build());
+    }
+
+    @POST
+    @Path("{id}")
+    public void createAccountPoisition(@Suspended AsyncResponse response, @Context UriInfo info, @PathParam("id") Long id, AccountPosition position) {
+        AccountPosition saved = accountPositionService.create();
+        long possitionId = saved.getId();
+        URI uri = info.getAbsolutePathBuilder().path("/accountpositions/" + possitionId).build();
+        response.resume(Response.created(uri).entity(saved).build());
+    }
+
 //    @GET
 //    @Path("{id}/accountpositions")
 //    public void getAccountPositionsForPlayer(@Suspended AsyncResponse response, @PathParam("id") Long id) {

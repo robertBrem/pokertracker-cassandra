@@ -1,10 +1,13 @@
 package com.optimist.pokerstats.pokertracker;
 
+import com.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
+import com.optimist.pokerstats.pokertracker.account.events.AccountPositionCreated;
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStore;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStream;
 import com.optimist.pokerstats.pokertracker.player.entity.Player;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
+import com.optimist.pokerstats.pokertracker.player.events.PlayerEvent;
 import lombok.Getter;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +23,9 @@ public class InMemoryCache {
 
     @Getter
     private Map<Long, Player> players = new HashMap<>();
+
+    @Getter
+    private Map<Long, AccountPosition> accountPositions = new HashMap<>();
 
     @Inject
     EventStore store;
@@ -42,9 +48,14 @@ public class InMemoryCache {
             events.add(event);
             Player player = new Player(events);
             players.put(event.getId(), player);
-        } else {
+        } else if (event instanceof PlayerEvent) {
             Player player = players.get(event.getId());
             player.mutate(event);
+        } else if (event instanceof AccountPositionCreated) {
+            ArrayList<CoreEvent> events = new ArrayList<>();
+            events.add(event);
+            AccountPosition accountPosition = new AccountPosition(events);
+            accountPositions.put(event.getId(), accountPosition);
         }
     }
 

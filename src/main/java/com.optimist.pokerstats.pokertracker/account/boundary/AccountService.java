@@ -1,10 +1,59 @@
 package com.optimist.pokerstats.pokertracker.account.boundary;
 
+import com.optimist.pokerstats.pokertracker.InMemoryCache;
+import com.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
+import com.optimist.pokerstats.pokertracker.eventstore.control.EventStore;
+import com.optimist.pokerstats.pokertracker.eventstore.entity.EventIdentity;
+
 import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.ws.rs.core.GenericEntity;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Stateless
 public class AccountService {
 
+    @Inject
+    EventStore store;
+
+    @Inject
+    InMemoryCache cache;
+
+    public GenericEntity<Set<AccountPosition>> findAllAsGenericEntities() {
+        return new GenericEntity<Set<AccountPosition>>(findAll()) {
+        };
+    }
+
+    public Set<AccountPosition> findAll() {
+        return new HashSet<>(cache.getAccountPositions().values());
+    }
+
+    public AccountPosition find(Long id) {
+        return cache.getAccountPositions().get(id);
+    }
+
+    public AccountPosition create() {
+        // TODO
+        Set<Long> accountPositionIds = cache.getAccountPositions().keySet();
+        Long maxId = 0L;
+        if (!accountPositionIds.isEmpty()) {
+            maxId = accountPositionIds.stream()
+                    .max(Long::compareTo)
+                    .get();
+        }
+
+        Long nextId = 0L;
+        if (maxId != null) {
+            nextId = maxId + 1;
+        }
+
+        AccountPosition accountPosition = new AccountPosition(new ArrayList<>());
+        accountPosition.create(nextId);
+        store.appendToStream(new EventIdentity(AccountPosition.class, nextId), 0L, accountPosition.getChanges());
+        return accountPosition;
+    }
 
 //    @Inject
 //    PlayerService playerService;
