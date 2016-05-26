@@ -38,6 +38,10 @@ public class Player {
         apply(new PlayerFirstNameChanged(id, firstName));
     }
 
+    public void changeLastName(String lastName) {
+        apply(new PlayerLastNameChanged(id, lastName));
+    }
+
     public void create(Long id) {
         apply(new PlayerCreated(id));
     }

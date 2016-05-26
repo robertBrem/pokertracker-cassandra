@@ -9,13 +9,8 @@ public class EventIdentity {
     private final Class<?> entityClass;
     private final Long id;
 
-    public boolean loadAllOfThisType() {
-        return id == null;
-    }
-
     @Override
     public String toString() {
-        String idSuffix = (loadAllOfThisType()) ? "" : ("-" + id);
-        return entityClass.getName() + idSuffix;
+        return entityClass.getName();
     }
 }

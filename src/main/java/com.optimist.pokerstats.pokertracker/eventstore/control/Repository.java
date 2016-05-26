@@ -10,21 +10,25 @@ import javax.inject.Inject;
 import javax.json.JsonArray;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Repository {
 
     @Inject
     Session session;
 
-    public List<DataWithVersion> readRecords(String name, Long version, Integer maxCount) {
-        String readSql = "select DATA, VERSION from EVENTS" +
-                " where NAME = :name and VERSION > :version"
+    public List<DataWithVersion> readRecords(Long id, String name, Long version, Integer maxCount) {
+        String readSql = "select ID, DATA, VERSION from EVENTS"
+                + " where ID = :id"
+                + " and NAME = :name+"
+                + " and VERSION > :version"
 //                +
 //                " order by VERSION" +
 //                " limit 0, :maxCount"
                 + " allow filtering";
         PreparedStatement readStmt = session.prepare(readSql);
         BoundStatement readRecords = readStmt.bind()
+                .setLong("id", id)
                 .setString("name", "'" + name + "'")
                 .setLong("version", version)
 //                .setInt("maxCount", maxCount)
@@ -35,14 +39,32 @@ public class Repository {
     }
 
     public List<DataWithVersion> readRecords(String name) {
-        String readSql = "select DATA, VERSION from EVENTS" +
-                " where NAME = :name"
+        String readSql = "select DATA, VERSION from EVENTS"
+                + " where NAME = :name"
+                + " allow filtering";
+        PreparedStatement readStmt = session.prepare(readSql);
+        BoundStatement readRecords = readStmt.bind()
+                .setString("name", "'" + name + "'");
+        List<Row> records = session.execute(readRecords)
+                .all();
+        List<DataWithVersion> dataWithVersions = convertToDataWithVersions(records);
+        return dataWithVersions.stream()
+                .sorted((data1, data2) -> Long.compare(data1.getVersion(),
+                        data2.getVersion()))
+                .collect(Collectors.toList());
+    }
+
+    public List<DataWithVersion> readRecords(Long id, String name) {
+        String readSql = "select DATA, VERSION from EVENTS"
+                + " where ID = :id"
+                + " and NAME = :name"
 //                +
 //                " order by VERSION" +
 //                " limit 0, :maxCount"
                 + " allow filtering";
         PreparedStatement readStmt = session.prepare(readSql);
         BoundStatement readRecords = readStmt.bind()
+                .setLong("id", id)
                 .setString("name", "'" + name + "'")
 //                .setInt("maxCount", maxCount)
                 ;
@@ -61,29 +83,31 @@ public class Repository {
     }
 
     // TODO ID
-    public Long getNextId() {
-        String versionSql = "select ID from EVENTS";
-        PreparedStatement versionStmt = session.prepare(versionSql);
-        BoundStatement readVersion = versionStmt.bind();
-        Long id = null;
-        List<Row> all = session.execute(readVersion).all();
-        if (all == null || all.isEmpty()) {
-            id = 0L;
-        } else {
-            id = all.stream()
-                    .map(row -> row.getLong("ID"))
-                    .max(Long::compareTo)
-                    .get() + 1;
-        }
-        return id;
-    }
+//    public Long getNextId() {
+//        String versionSql = "select ID from EVENTS";
+//        PreparedStatement versionStmt = session.prepare(versionSql);
+//        BoundStatement readVersion = versionStmt.bind();
+//        Long id = null;
+//        List<Row> all = session.execute(readVersion).all();
+//        if (all == null || all.isEmpty()) {
+//            id = 0L;
+//        } else {
+//            id = all.stream()
+//                    .map(row -> row.getLong("ID"))
+//                    .max(Long::compareTo)
+//                    .get() + 1;
+//        }
+//        return id;
+//    }
 
-    public void append(String name, JsonArray data, Long expectedVersion) {
-        String versionSql = "select VERSION from EVENTS" +
-                " where NAME = :name" +
+    public void append(Long id, String name, JsonArray data, Long expectedVersion) {
+        String versionSql = "select VERSION from EVENTS"
+                + " where ID = :id"
+                + " and NAME = :name" +
                 " allow filtering";
         PreparedStatement versionStmt = session.prepare(versionSql);
         BoundStatement readVersion = versionStmt.bind()
+                .setLong("id", id)
                 .setString("name", "'" + name + "'");
         Long version = null;
         List<Row> all = session.execute(readVersion).all();
@@ -103,7 +127,7 @@ public class Repository {
                 " values (:id, :name, :version, :data)";
         PreparedStatement insertStmt = session.prepare(insertSql);
         BoundStatement insert = insertStmt.bind()
-                .setLong("id", getNextId())
+                .setLong("id", id)
                 .setString("name", "'" + name + "'")
                 .setLong("version", newVersion)
                 .setString("data", data.toString());

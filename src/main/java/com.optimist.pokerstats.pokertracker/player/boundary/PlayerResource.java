@@ -37,7 +37,12 @@ public class PlayerResource {
     @POST
     public void save(@Suspended AsyncResponse response, @Context UriInfo info, Player player) {
         Player saved = service.create();
-        saved = service.changeFirstName(saved.getId(), player.getFirstName());
+        if (player.getFirstName() != null) {
+            saved = service.changeFirstName(saved.getId(), player.getFirstName());
+        }
+        if (player.getLastName() != null) {
+            saved = service.changeLastName(saved.getId(), player.getLastName());
+        }
         long id = saved.getId();
         URI uri = info.getAbsolutePathBuilder().path("/" + id).build();
         response.resume(Response.created(uri).entity(saved).build());

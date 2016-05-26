@@ -31,38 +31,44 @@ public class EventStore {
         }
         String name = id.toString();
         JsonArray data = convertToJson(events);
-        repository.append(name, data, originalVersion);
+        repository.append(id.getId(), name, data, originalVersion);
 
         events.stream()
                 .forEach(e -> eventChannel.fire(e));
     }
 
+    public EventStream loadEventStream(String name) {
+        List<DataWithVersion> records = repository.readRecords(name);
+        return toEventStream(records);
+    }
+
     public EventStream loadEventStream(EventIdentity id) {
         String name = id.toString();
-        List<DataWithVersion> records = repository.readRecords(name);
+        List<DataWithVersion> records = repository.readRecords(id.getId(), name);
 
         return toEventStream(records);
     }
 
     public EventStream loadEventStream(EventIdentity id, Long minVersion, Integer take) {
         String name = id.toString();
-        List<DataWithVersion> records = repository.readRecords(name, minVersion, take);
-
+        List<DataWithVersion> records = repository.readRecords(id.getId(), name, minVersion, take);
         return toEventStream(records);
     }
 
     private EventStream toEventStream(List<DataWithVersion> records) {
-        Long maxVersion = records.stream()
-                .map(DataWithVersion::getVersion)
-                .max(Long::compareTo)
-                .get();
+        Long maxVersion = 0L;
+        if (!records.isEmpty()) {
+            maxVersion = records.stream()
+                    .map(DataWithVersion::getVersion)
+                    .max(Long::compareTo)
+                    .get();
+        }
 
         List<CoreEvent> events = records.stream()
                 .map(DataWithVersion::getData)
                 .map(this::convertToEvents)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
-
 
         return new EventStream(maxVersion, events);
     }
@@ -106,15 +112,15 @@ public class EventStore {
             } else if (PlayerFirstNameChanged.class.getName().equals(name)) {
                 String firstName = eventObj.getString("firstName");
                 PlayerFirstNameChanged event = new PlayerFirstNameChanged(id, firstName);
-            } else if (PlayerFirstNameChanged.class.getName().equals(name)) {
+                events.add(event);
+            } else if (PlayerLastNameChanged.class.getName().equals(name)) {
                 String lastName = eventObj.getString("lastName");
                 PlayerLastNameChanged event = new PlayerLastNameChanged(id, lastName);
+                events.add(event);
             } else {
                 throw new NotImplementedException();
             }
         }
         return events;
     }
-
-
 }
