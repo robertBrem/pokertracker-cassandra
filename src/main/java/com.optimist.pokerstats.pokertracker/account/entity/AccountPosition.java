@@ -2,7 +2,6 @@ package com.optimist.pokerstats.pokertracker.account.entity;
 
 import com.optimist.pokerstats.pokertracker.account.events.AccountPositionCreated;
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
-import com.optimist.pokerstats.pokertracker.player.entity.Player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AccountPosition {
     private Long id;
-    private Player player;
+    private Long playerId;
     private Long amount;
     private String currency;
     private Date date;

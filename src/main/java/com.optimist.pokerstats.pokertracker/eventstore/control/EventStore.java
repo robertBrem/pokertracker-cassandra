@@ -1,5 +1,6 @@
 package com.optimist.pokerstats.pokertracker.eventstore.control;
 
+import com.optimist.pokerstats.pokertracker.account.events.AccountPositionCreated;
 import com.optimist.pokerstats.pokertracker.eventstore.entity.DataWithVersion;
 import com.optimist.pokerstats.pokertracker.eventstore.entity.EventIdentity;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
@@ -89,6 +90,8 @@ public class EventStore {
                 PlayerLastNameChanged changedEvent = (PlayerLastNameChanged) event;
                 jsonEvent = jsonEvent
                         .add("lastName", changedEvent.getLastName());
+            } else if (event instanceof AccountPositionCreated) {
+                // no more to do
             } else {
                 throw new NotImplementedException();
             }
