@@ -105,17 +105,16 @@ public class PlayerResource {
         response.resume(accountPositionService.getHistoryForPlayerAsJson(id, summedUp, ChronoUnit.MINUTES));
     }
 
-//    @GET
-//    @Path("accounthistory")
-//    public void getAccountHistory(@Suspended AsyncResponse response, @QueryParam("summedUp") Boolean summedUp, @QueryParam("timeUnit") String timeUnitText) {
-//        ChronoUnit timeUnit = ChronoUnit.MINUTES;
-//        if (timeUnitText != null && !timeUnitText.isEmpty()) {
-//            timeUnit = ChronoUnit.valueOf(timeUnitText);
-//        }
-//        response.resume(accountService.getHistoryAsJsonArray(summedUp, timeUnit));
-//    }
-//
-//
+    @GET
+    @Path("accounthistory")
+    public void getAccountHistory(@Suspended AsyncResponse response, @QueryParam("summedUp") Boolean summedUp, @QueryParam("timeUnit") String timeUnitText) {
+        ChronoUnit timeUnit = ChronoUnit.MINUTES;
+        if (timeUnitText != null && !timeUnitText.isEmpty()) {
+            timeUnit = ChronoUnit.valueOf(timeUnitText);
+        }
+        response.resume(accountPositionService.getHistoryAsJsonArray(summedUp, timeUnit));
+    }
+
 //    @GET
 //    @Path("{id}/balance")
 //    public void getBalance(@Suspended AsyncResponse response, @PathParam("id") Long id) {

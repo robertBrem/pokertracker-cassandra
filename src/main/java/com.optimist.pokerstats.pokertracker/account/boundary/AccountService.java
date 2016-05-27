@@ -5,6 +5,7 @@ import com.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStore;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStream;
 import com.optimist.pokerstats.pokertracker.eventstore.entity.EventIdentity;
+import com.optimist.pokerstats.pokertracker.player.entity.Player;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -174,77 +175,39 @@ public class AccountService {
         }
         return historySummedUp;
     }
-//    @Inject
-//    PlayerService playerService;
-//
 
-//    public JsonArray getHistoryAsJsonArray(Boolean summedUp, TemporalUnit groupUnit) {
-//        JsonArrayBuilder result = Json.createArrayBuilder();
-//
-//        LinkedHashMap<Date, Long> allPositions = getHistory(getAllAccountPositions(), groupUnit);
-//        Date start = allPositions.keySet().stream()
-//                .min(Date::compareTo)
-//                .get();
-//        Date end = allPositions.keySet().stream()
-//                .max(Date::compareTo)
-//                .get();
-//
-//        for (Player player : playerService.getAllPlayers()) {
-//            LinkedHashMap<Date, Long> history = getHistory(findByPlayerId(player.getId()), start, end, groupUnit);
-//            if (summedUp != null && summedUp) {
-//                history = getSummedUp(history);
-//            }
-//            JsonObject entry = Json.createObjectBuilder()
-//                    .add("playerName", player.getFormattedName())
-//                    .add("history", getJsonArray(history))
-//                    .build();
-//            result.add(entry);
-//        }
-//        return result.build();
-//    }
-//
-//
-//
-//    /**
-//     * Named Queries with parameters are not supported in Kundera for now.
-//     */
-//    public List<AccountPosition> findByPlayerId(Long playerId) {
-//        Player player = playerService.find(playerId);
-//
-//        List<?> nativeQuery = em.createNativeQuery("SELECT \"ACCOUNT_POSITION_ID\", \"AMOUNT\", \"CURRENCY\", \"DATE\", \"CREATION\" FROM \"ACCOUNT_POSITIONS\" WHERE \"PLAYER_ID\" = " + playerId).getResultList();
-//        List<Map<String, Object>> nativeResult = (List<Map<String, Object>>) nativeQuery;
-//        List<AccountPosition> result = new ArrayList<>();
-//        for (Map<String, Object> position : nativeResult) {
-//            Long accountPositionId = (Long) position.get("ACCOUNT_POSITION_ID");
-//            Long amount = (Long) position.get("AMOUNT");
-//            String currency = (String) position.get("CURRENCY");
-//            Date date = (Date) position.get("DATE");
-//            Date creation = (Date) position.get("CREATION");
-//            result.add(new AccountPosition(accountPositionId, player, amount, currency, date, creation));
-//        }
-//        return result;
-//    }
-//
-//    public AccountPosition findById(Long id) {
-//        return em.find(AccountPosition.class, id);
-//    }
-//
-//    public AccountPosition save(AccountPosition position, Long playerId) {
-//        Player player = playerService.find(playerId);
-//        position.setPlayer(player);
-//        position.setTimestamp(new Date());
-//        position.setDate(new Date());
-//        return em.merge(position);
-//    }
-//
-//    public GenericEntity<List<AccountPosition>> getAllAccountPositionsAsGenericEntity() {
-//        List<AccountPosition> positions = getAllAccountPositions();
-//        return new GenericEntity<List<AccountPosition>>(positions) {
-//        };
-//    }
-//
-//    public List<AccountPosition> getAllAccountPositions() {
-//        return em.createNamedQuery("AccountPositions.findAll", AccountPosition.class).getResultList();
-//    }
+    public JsonArray getHistoryAsJsonArray(Boolean summedUp, TemporalUnit groupUnit) {
+        JsonArrayBuilder result = Json.createArrayBuilder();
 
+        LinkedHashMap<LocalDateTime, Long> allPositions = getHistory(getAllAccountPositions(), groupUnit);
+        LocalDateTime start = allPositions.keySet().stream()
+                .min(LocalDateTime::compareTo)
+                .get();
+        LocalDateTime end = allPositions.keySet().stream()
+                .max(LocalDateTime::compareTo)
+                .get();
+
+        for (Player player : cache.getPlayers().values()) {
+            LinkedHashMap<LocalDateTime, Long> history = getHistory(findByPlayerId(player.getId()), start, end, groupUnit);
+            if (summedUp != null && summedUp) {
+                history = getSummedUp(history);
+            }
+            JsonObject entry = Json.createObjectBuilder()
+                    .add("playerName", player.getFormattedName())
+                    .add("history", getJsonArray(history))
+                    .build();
+            result.add(entry);
+        }
+        return result.build();
+    }
+
+    public GenericEntity<List<AccountPosition>> getAllAccountPositionsAsGenericEntity() {
+        List<AccountPosition> positions = getAllAccountPositions();
+        return new GenericEntity<List<AccountPosition>>(positions) {
+        };
+    }
+
+    public List<AccountPosition> getAllAccountPositions() {
+        return new ArrayList<>(cache.getAccountPositions().values());
+    }
 }
