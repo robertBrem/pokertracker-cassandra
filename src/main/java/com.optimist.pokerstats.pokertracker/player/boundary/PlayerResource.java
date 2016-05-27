@@ -12,6 +12,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.*;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -98,12 +99,12 @@ public class PlayerResource {
         response.resume(positions);
     }
 
-//    @GET
-//    @Path("{id}/accounthistory")
-//    public void getAccountHistoryForPlayer(@Suspended AsyncResponse response, @PathParam("id") Long id, @QueryParam("summedUp") Boolean summedUp) {
-//        response.resume(accountService.getHistoryForPlayerAsJson(id, summedUp, ChronoUnit.MINUTES));
-//    }
-//
+    @GET
+    @Path("{id}/accounthistory")
+    public void getAccountHistoryForPlayer(@Suspended AsyncResponse response, @PathParam("id") Long id, @QueryParam("summedUp") Boolean summedUp) {
+        response.resume(accountPositionService.getHistoryForPlayerAsJson(id, summedUp, ChronoUnit.MINUTES));
+    }
+
 //    @GET
 //    @Path("accounthistory")
 //    public void getAccountHistory(@Suspended AsyncResponse response, @QueryParam("summedUp") Boolean summedUp, @QueryParam("timeUnit") String timeUnitText) {
