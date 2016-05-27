@@ -3,14 +3,18 @@ package com.optimist.pokerstats.pokertracker.account.boundary;
 import com.optimist.pokerstats.pokertracker.InMemoryCache;
 import com.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStore;
+import com.optimist.pokerstats.pokertracker.eventstore.control.EventStream;
 import com.optimist.pokerstats.pokertracker.eventstore.entity.EventIdentity;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.core.GenericEntity;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Stateless
 public class AccountService {
@@ -55,14 +59,53 @@ public class AccountService {
         return accountPosition;
     }
 
+    public AccountPosition changePlayerId(Long id, Long playerId) {
+        EventStream stream = store.loadEventStream(new EventIdentity(AccountPosition.class, id));
+        AccountPosition accountPosition = new AccountPosition(stream.getEvents());
+        accountPosition.changePlayerId(playerId);
+        store.appendToStream(new EventIdentity(AccountPosition.class, id), stream.getVersion(), accountPosition.getChanges());
+        return accountPosition;
+    }
+
+    public AccountPosition changeAmount(Long id, Long amount) {
+        EventStream stream = store.loadEventStream(new EventIdentity(AccountPosition.class, id));
+        AccountPosition accountPosition = new AccountPosition(stream.getEvents());
+        accountPosition.changeAmount(amount);
+        store.appendToStream(new EventIdentity(AccountPosition.class, id), stream.getVersion(), accountPosition.getChanges());
+        return accountPosition;
+    }
+
+    public AccountPosition changeCurrency(Long id, String currency) {
+        EventStream stream = store.loadEventStream(new EventIdentity(AccountPosition.class, id));
+        AccountPosition accountPosition = new AccountPosition(stream.getEvents());
+        accountPosition.changeCurrency(currency);
+        store.appendToStream(new EventIdentity(AccountPosition.class, id), stream.getVersion(), accountPosition.getChanges());
+        return accountPosition;
+    }
+
+    public AccountPosition changeCreationDate(Long id, LocalDateTime creationDate) {
+        EventStream stream = store.loadEventStream(new EventIdentity(AccountPosition.class, id));
+        AccountPosition accountPosition = new AccountPosition(stream.getEvents());
+        accountPosition.changeCreationDate(creationDate);
+        store.appendToStream(new EventIdentity(AccountPosition.class, id), stream.getVersion(), accountPosition.getChanges());
+        return accountPosition;
+    }
+
+    public GenericEntity<List<AccountPosition>> findByPlayerIdAsGenericEntities(Long playerId) {
+        return new GenericEntity<List<AccountPosition>>(findByPlayerId(playerId)) {
+        };
+    }
+
+    public List<AccountPosition> findByPlayerId(Long playerId) {
+        return cache.getAccountPositions().values().stream()
+                .filter(ap -> playerId != null && playerId.equals(ap.getPlayerId()))
+                .collect(Collectors.toList());
+    }
+
 //    @Inject
 //    PlayerService playerService;
 //
-//    public GenericEntity<List<AccountPosition>> findByPlayerIdAsGenericEntities(Long playerId) {
-//        return new GenericEntity<List<AccountPosition>>(findByPlayerId(playerId)) {
-//        };
-//    }
-//
+
 //    public JsonArray getHistoryAsJsonArray(Boolean summedUp, TemporalUnit groupUnit) {
 //        JsonArrayBuilder result = Json.createArrayBuilder();
 //

@@ -1,20 +1,19 @@
 package com.optimist.pokerstats.pokertracker.account.entity;
 
-import com.optimist.pokerstats.pokertracker.account.events.AccountPositionCreated;
+import com.optimist.pokerstats.pokertracker.account.events.*;
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -27,7 +26,7 @@ public class AccountPosition {
     private Long playerId;
     private Long amount;
     private String currency;
-    private Date date;
+    private LocalDateTime creationDate;
 
 
     @XmlTransient
@@ -56,11 +55,36 @@ public class AccountPosition {
     public void when(CoreEvent event) {
         if (event instanceof AccountPositionCreated) {
             this.id = event.getId();
+        } else if (event instanceof AccountPositionPlayerIdChanged) {
+            this.playerId = ((AccountPositionPlayerIdChanged) event).getPlayerId();
+        } else if (event instanceof AccountPositionAmountChanged) {
+            this.amount = ((AccountPositionAmountChanged) event).getAmount();
+        } else if (event instanceof AccountPositionCurrencyChanged) {
+            this.currency = ((AccountPositionCurrencyChanged) event).getCurrency();
+        } else if (event instanceof AccountPositionCreationDateChanged) {
+            this.creationDate = ((AccountPositionCreationDateChanged) event).getCreationDate();
+        } else {
+            throw new NotImplementedException();
         }
     }
 
+    public void changePlayerId(Long playerId) {
+        apply(new AccountPositionPlayerIdChanged(id, playerId));
+    }
+
+    public void changeAmount(Long amount) {
+        apply(new AccountPositionAmountChanged(id, amount));
+    }
+
+    public void changeCurrency(String currency) {
+        apply(new AccountPositionCurrencyChanged(id, currency));
+    }
+
+    public void changeCreationDate(LocalDateTime creationDate) {
+        apply(new AccountPositionCreationDateChanged(id, creationDate));
+    }
+
     public LocalDateTime getRounded(TemporalUnit groupUnit) {
-        LocalDateTime asLDT = LocalDateTime.ofInstant(getDate().toInstant(), ZoneId.systemDefault());
-        return asLDT.truncatedTo(groupUnit);
+        return getCreationDate().truncatedTo(groupUnit);
     }
 }

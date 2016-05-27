@@ -9,11 +9,10 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
@@ -74,21 +73,31 @@ public class PlayerResource {
     }
 
     @POST
-    @Path("{id}")
+    @Path("{id}/accountpositions")
     public void createAccountPoisition(@Suspended AsyncResponse response, @Context UriInfo info, @PathParam("id") Long id, AccountPosition position) {
         AccountPosition saved = accountPositionService.create();
-        long possitionId = saved.getId();
-        URI uri = info.getAbsolutePathBuilder().path("/accountpositions/" + possitionId).build();
+        Long possitionId = saved.getId();
+        saved = accountPositionService.changeCreationDate(possitionId, LocalDateTime.now());
+        if (position.getPlayerId() != null) {
+            saved = accountPositionService.changePlayerId(possitionId, position.getPlayerId());
+        }
+        if (position.getAmount() != null) {
+            saved = accountPositionService.changeAmount(possitionId, position.getAmount());
+        }
+        if (position.getCurrency() != null) {
+            saved = accountPositionService.changeCurrency(possitionId, position.getCurrency());
+        }
+        URI uri = info.getAbsolutePathBuilder().path("/" + possitionId).build();
         response.resume(Response.created(uri).entity(saved).build());
     }
 
-//    @GET
-//    @Path("{id}/accountpositions")
-//    public void getAccountPositionsForPlayer(@Suspended AsyncResponse response, @PathParam("id") Long id) {
-//        GenericEntity<List<AccountPosition>> positions = accountService.findByPlayerIdAsGenericEntities(id);
-//        response.resume(positions);
-//    }
-//
+    @GET
+    @Path("{id}/accountpositions")
+    public void getAccountPositionsForPlayer(@Suspended AsyncResponse response, @PathParam("id") Long id) {
+        GenericEntity<List<AccountPosition>> positions = accountPositionService.findByPlayerIdAsGenericEntities(id);
+        response.resume(positions);
+    }
+
 //    @GET
 //    @Path("{id}/accounthistory")
 //    public void getAccountHistoryForPlayer(@Suspended AsyncResponse response, @PathParam("id") Long id, @QueryParam("summedUp") Boolean summedUp) {

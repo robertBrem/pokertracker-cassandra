@@ -2,6 +2,7 @@ package com.optimist.pokerstats.pokertracker;
 
 import com.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import com.optimist.pokerstats.pokertracker.account.events.AccountPositionCreated;
+import com.optimist.pokerstats.pokertracker.account.events.AccountPositionEvent;
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStore;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStream;
@@ -9,6 +10,7 @@ import com.optimist.pokerstats.pokertracker.player.entity.Player;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerEvent;
 import lombok.Getter;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -36,6 +38,10 @@ public class InMemoryCache {
         for (CoreEvent event : eventStream.getEvents()) {
             handle(event);
         }
+        eventStream = store.loadEventStream(AccountPosition.class.getName());
+        for (CoreEvent event : eventStream.getEvents()) {
+            handle(event);
+        }
     }
 
     public void handleEvent(@Observes CoreEvent event) {
@@ -56,6 +62,11 @@ public class InMemoryCache {
             events.add(event);
             AccountPosition accountPosition = new AccountPosition(events);
             accountPositions.put(event.getId(), accountPosition);
+        } else if (event instanceof AccountPositionEvent) {
+            AccountPosition accountPosition = accountPositions.get(event.getId());
+            accountPosition.mutate(event);
+        } else {
+            throw new NotImplementedException();
         }
     }
 
