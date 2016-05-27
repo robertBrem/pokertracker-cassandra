@@ -109,12 +109,16 @@ public class PlayerResource {
 
     @GET
     @Path("accounthistory")
-    public void getAccountHistory(@Suspended AsyncResponse response, @QueryParam("summedUp") Boolean summedUp, @QueryParam("timeUnit") String timeUnitText) {
+    public void getAccountHistory(@Suspended AsyncResponse response, @QueryParam("summedUp") Boolean summedUp, @QueryParam("timeUnit") String timeUnitText, @QueryParam("maxEntries") Integer maxEntries) {
         ChronoUnit timeUnit = ChronoUnit.MINUTES;
         if (timeUnitText != null && !timeUnitText.isEmpty()) {
             timeUnit = ChronoUnit.valueOf(timeUnitText);
         }
-        response.resume(accountPositionService.getHistoryAsJsonArray(summedUp, timeUnit));
+        Integer max = Integer.MAX_VALUE;
+        if (maxEntries != null) {
+            max = maxEntries;
+        }
+        response.resume(accountPositionService.getHistoryAsJsonArray(summedUp, timeUnit, max));
     }
 
     @GET

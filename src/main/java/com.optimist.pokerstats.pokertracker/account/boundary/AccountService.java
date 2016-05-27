@@ -130,6 +130,18 @@ public class AccountService {
         return historyAsJson.build();
     }
 
+    public LinkedHashMap<LocalDateTime, Long> getHistory(List<AccountPosition> positions, TemporalUnit groupUnit, Integer maxEntries) {
+        LocalDateTime start = positions.stream()
+                .map(AccountPosition::getCreationDate)
+                .min(LocalDateTime::compareTo)
+                .get();
+        LocalDateTime end = positions.stream()
+                .map(AccountPosition::getCreationDate)
+                .max(LocalDateTime::compareTo)
+                .get();
+        return getHistory(positions, start, end, groupUnit, maxEntries);
+    }
+
     public LinkedHashMap<LocalDateTime, Long> getHistory(List<AccountPosition> positions, TemporalUnit groupUnit) {
         LocalDateTime start = positions.stream()
                 .map(AccountPosition::getCreationDate)
@@ -142,7 +154,7 @@ public class AccountService {
         return getHistory(positions, start, end, groupUnit);
     }
 
-    public LinkedHashMap<LocalDateTime, Long> getHistory(List<AccountPosition> positions, LocalDateTime start, LocalDateTime end, TemporalUnit groupUnit) {
+    public LinkedHashMap<LocalDateTime, Long> getHistory(List<AccountPosition> positions, LocalDateTime start, LocalDateTime end, TemporalUnit groupUnit, Integer maxEntries) {
         Map<LocalDateTime, List<AccountPosition>> groupByDate = positions.stream()
                 .collect(Collectors.groupingBy(ap -> ap.getRounded(groupUnit)));
 
@@ -160,7 +172,24 @@ public class AccountService {
                     .reduce(0L, Long::sum);
             history.put(current, balance);
         }
+
+        if (history.size() > maxEntries) {
+            Set<LocalDateTime> localDateTimes = history.keySet();
+            List<LocalDateTime> list = new ArrayList<>(localDateTimes);
+            list.sort(LocalDateTime::compareTo);
+            List<LocalDateTime> sublist = list.subList(list.size() - maxEntries, list.size());
+            LinkedHashMap<LocalDateTime, Long> historyShortend = new LinkedHashMap<>();
+            for (LocalDateTime current : sublist) {
+                historyShortend.put(current, history.get(current));
+            }
+            history = historyShortend;
+        }
+
         return history;
+    }
+
+    public LinkedHashMap<LocalDateTime, Long> getHistory(List<AccountPosition> positions, LocalDateTime start, LocalDateTime end, TemporalUnit groupUnit) {
+        return getHistory(positions, start, end, groupUnit, Integer.MAX_VALUE);
     }
 
     public LinkedHashMap<LocalDateTime, Long> getSummedUp(LinkedHashMap<LocalDateTime, Long> history) {
@@ -178,10 +207,10 @@ public class AccountService {
         return historySummedUp;
     }
 
-    public JsonArray getHistoryAsJsonArray(Boolean summedUp, TemporalUnit groupUnit) {
+    public JsonArray getHistoryAsJsonArray(Boolean summedUp, TemporalUnit groupUnit, Integer maxEntries) {
         JsonArrayBuilder result = Json.createArrayBuilder();
 
-        LinkedHashMap<LocalDateTime, Long> allPositions = getHistory(getAllAccountPositions(), groupUnit);
+        LinkedHashMap<LocalDateTime, Long> allPositions = getHistory(getAllAccountPositions(), groupUnit, maxEntries);
         LocalDateTime start = allPositions.keySet().stream()
                 .min(LocalDateTime::compareTo)
                 .get();
