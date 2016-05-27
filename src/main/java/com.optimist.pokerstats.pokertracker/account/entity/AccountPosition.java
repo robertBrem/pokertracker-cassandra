@@ -1,5 +1,6 @@
 package com.optimist.pokerstats.pokertracker.account.entity;
 
+import com.optimist.pokerstats.pokertracker.LocalDateTimeAdapter;
 import com.optimist.pokerstats.pokertracker.account.events.*;
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class AccountPosition {
     private Long playerId;
     private Long amount;
     private String currency;
+    @XmlJavaTypeAdapter(LocalDateTimeAdapter.class)
     private LocalDateTime creationDate;
 
 
