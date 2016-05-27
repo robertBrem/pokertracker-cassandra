@@ -6,6 +6,8 @@ import com.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import com.optimist.pokerstats.pokertracker.player.entity.Player;
 
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
@@ -115,25 +117,18 @@ public class PlayerResource {
         response.resume(accountPositionService.getHistoryAsJsonArray(summedUp, timeUnit));
     }
 
-//    @GET
-//    @Path("{id}/balance")
-//    public void getBalance(@Suspended AsyncResponse response, @PathParam("id") Long id) {
-//        List<AccountPosition> positions = accountService.findByPlayerId(id);
-//        Long balance = positions.stream()
-//                .map(AccountPosition::getAmount)
-//                .reduce(0L, Long::sum);
-//        JsonObject balanceJson = Json.createObjectBuilder()
-//                .add("value", balance)
-//                .add("currency", "CHF")
-//                .build();
-//        response.resume(balanceJson);
-//    }
-//
-//    @GET
-//    @Path("{id}/accountpositions/{accountPositionId}")
-//    public void getAccountPositions(@Suspended AsyncResponse response, @PathParam("id") Long id, @PathParam("accountPositionId") Long accountPositionId) {
-//        response.resume(accountService.findById(accountPositionId));
-//    }
-
+    @GET
+    @Path("{id}/balance")
+    public void getBalance(@Suspended AsyncResponse response, @PathParam("id") Long id) {
+        List<AccountPosition> positions = accountPositionService.findByPlayerId(id);
+        Long balance = positions.stream()
+                .map(AccountPosition::getAmount)
+                .reduce(0L, Long::sum);
+        JsonObject balanceJson = Json.createObjectBuilder()
+                .add("value", balance)
+                .add("currency", "CHF")
+                .build();
+        response.resume(balanceJson);
+    }
 
 }
