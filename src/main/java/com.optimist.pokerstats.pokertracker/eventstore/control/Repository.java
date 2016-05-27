@@ -9,6 +9,7 @@ import com.optimist.pokerstats.pokertracker.eventstore.entity.DataWithVersion;
 import javax.inject.Inject;
 import javax.json.JsonArray;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,24 +83,6 @@ public class Repository {
         return result;
     }
 
-    // TODO ID
-//    public Long getNextId() {
-//        String versionSql = "select ID from EVENTS";
-//        PreparedStatement versionStmt = session.prepare(versionSql);
-//        BoundStatement readVersion = versionStmt.bind();
-//        Long id = null;
-//        List<Row> all = session.execute(readVersion).all();
-//        if (all == null || all.isEmpty()) {
-//            id = 0L;
-//        } else {
-//            id = all.stream()
-//                    .map(row -> row.getLong("ID"))
-//                    .max(Long::compareTo)
-//                    .get() + 1;
-//        }
-//        return id;
-//    }
-
     public void append(Long id, String name, JsonArray data, Long expectedVersion) {
         String versionSql = "select VERSION from EVENTS"
                 + " where ID = :id"
@@ -123,13 +106,14 @@ public class Repository {
             throw new RuntimeException("AppendConcurrentException, version does not match!");
         }
         Long newVersion = version + 1;
-        String insertSql = "insert into EVENTS (ID, NAME, VERSION, DATA)" +
-                " values (:id, :name, :version, :data)";
+        String insertSql = "insert into EVENTS (ID, NAME, VERSION, DATE, DATA)" +
+                " values (:id, :name, :version, :date, :data)";
         PreparedStatement insertStmt = session.prepare(insertSql);
         BoundStatement insert = insertStmt.bind()
                 .setLong("id", id)
                 .setString("name", "'" + name + "'")
                 .setLong("version", newVersion)
+                .setTimestamp("date", new Date())
                 .setString("data", data.toString());
         session.execute(insert);
     }

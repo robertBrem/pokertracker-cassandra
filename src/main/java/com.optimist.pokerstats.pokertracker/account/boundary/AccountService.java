@@ -147,7 +147,9 @@ public class AccountService {
                 .collect(Collectors.groupingBy(ap -> ap.getRounded(groupUnit)));
 
         LinkedHashMap<LocalDateTime, Long> history = new LinkedHashMap<>();
-        for (LocalDateTime current = start; !current.isAfter(end); current = current.plus(1L, groupUnit)) {
+        LocalDateTime startRounded = start.truncatedTo(groupUnit);
+        LocalDateTime endRounded = end.truncatedTo(groupUnit);
+        for (LocalDateTime current = startRounded; !current.isAfter(endRounded); current = current.plus(1L, groupUnit)) {
             LocalDateTime groupUnitRounded = current.truncatedTo(groupUnit);
             List<AccountPosition> positionsForGroupUnit = groupByDate.get(groupUnitRounded);
             if (positionsForGroupUnit == null) {
