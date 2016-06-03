@@ -1,8 +1,8 @@
 {
   "realm": "pokerstats",
-  "realm-public-key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhCDSVgrCA6Q/ZYm1gthHg707kQSbiDJm9WUzjwE/yBxCKrm6K/nvAaCWbe3VSr47SASAqafJLH1iZ7hgpMptNBjZNzO6A++5Rj2xQoZTgF52UH1zqO5qGXiAPiYpd75Gw4I/XlqJt4tV4Xr+9a1uEK8Z/INgD8YjlHiodyknBTvGFMByKt5/IslI31k8hlmIttY253RGgUtzk00koYt6qHW/I7aY5gdbh51fDyBH1ZRY21o5pwSC+JggAFSraFVsMiRMMb0t0ml5Yu/FV0Y2npWxT5nGw+1ezDTVe8mAvQ6E5a1OJzzHMu9IviD5NOBdRd8UPvTlDqCCl6cvCDdOXwIDAQAB",
+  "realm-public-key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjG4TKGqJBqJKCRrexl/7jCtHjfdcUi7/qQFtBYw99GqiCBfCPEBzzO7BQXRyBEZ+QTQTlwIZ222FYIxW4UcJfZfZg/WxMg+gA/aTyJdh85FxhK5kSVHz4rUaR4/lTlB5+433yDFqvw9IaClS7mIeVN/sf0VirgNrWEXXfi9klEXMGox7n6dFGeQ9WkccddQQ9B64t1LFgJk+ub31PnhN+YZOEPECxwjZs3jcxO055vf3FLrijkhysg33Jctvp1lpddN3ZYYzAxFlFzuE7qJE6UmaeFkELU0lNX5KYWkA+VbDoyyGiOtSdK5BjiYvUjH5f/diXkjy7aPpWSWA3UG/aQIDAQAB",
   "bearer-only": true,
-  "auth-server-url": "http://localhost:8686/auth",
+  "auth-server-url": "https://5.189.173.45:30082/auth",
   "ssl-required": "none",
   "resource": "pokertracker"
 }
