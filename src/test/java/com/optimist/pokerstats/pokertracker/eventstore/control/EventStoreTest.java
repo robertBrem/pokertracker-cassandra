@@ -2,7 +2,6 @@ package com.optimist.pokerstats.pokertracker.eventstore.control;
 
 
 import com.optimist.pokerstats.pokertracker.player.events.PlayerFirstNameChanged;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
