@@ -56,6 +56,16 @@ public class PlayerService {
         return player;
     }
 
+    public void delete(Long id) {
+        EventStream stream = store.loadEventStream(new EventIdentity(Player.class, id));
+        if (stream.isEmpty()) {
+            return;
+        }
+        Player player = new Player(stream.getEvents());
+        player.delete();
+        store.appendToStream(new EventIdentity(Player.class, id), stream.getVersion(), player.getChanges());
+    }
+
     public Player changeFirstName(Long id, String firstName) {
         EventStream stream = store.loadEventStream(new EventIdentity(Player.class, id));
         Player player = new Player(stream.getEvents());

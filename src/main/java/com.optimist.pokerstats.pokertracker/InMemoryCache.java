@@ -8,6 +8,7 @@ import com.optimist.pokerstats.pokertracker.eventstore.control.EventStore;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStream;
 import com.optimist.pokerstats.pokertracker.player.entity.Player;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
+import com.optimist.pokerstats.pokertracker.player.events.PlayerDeleted;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerEvent;
 import lombok.Getter;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -54,6 +55,9 @@ public class InMemoryCache {
             events.add(event);
             Player player = new Player(events);
             players.put(event.getId(), player);
+        } else if (event instanceof PlayerDeleted) {
+            Player player = players.get(event.getId());
+            players.remove(player.getId());
         } else if (event instanceof PlayerEvent) {
             Player player = players.get(event.getId());
             player.mutate(event);

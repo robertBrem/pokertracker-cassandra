@@ -12,18 +12,6 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
-/**
- * CREATE KEYSPACE com.optimist.pokerstats.pokertracker WITH REPLICATION = { 'class' : 'SimpleStrategy','replication_factor' : 3 };
- * <p>
- * USE com.optimist.pokerstats.pokertracker;
- * <p>
- * CREATE TABLE EVENTS (
- * ID long PRIMARY KEY,
- * NAME text,
- * VERSION long,
- * DATA text
- * );
- */
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class CassandraProvider {

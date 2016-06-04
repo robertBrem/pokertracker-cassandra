@@ -4,6 +4,7 @@ import com.optimist.pokerstats.pokertracker.account.events.*;
 import com.optimist.pokerstats.pokertracker.eventstore.entity.DataWithVersion;
 import com.optimist.pokerstats.pokertracker.eventstore.entity.EventIdentity;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
+import com.optimist.pokerstats.pokertracker.player.events.PlayerDeleted;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerFirstNameChanged;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerLastNameChanged;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -83,6 +84,8 @@ public class EventStore {
                     .add("id", event.getId());
             if (event instanceof PlayerCreated) {
                 // no more to do
+            } else if (event instanceof PlayerDeleted) {
+                // no more to do
             } else if (event instanceof PlayerFirstNameChanged) {
                 PlayerFirstNameChanged changedEvent = (PlayerFirstNameChanged) event;
                 jsonEvent = jsonEvent
@@ -128,6 +131,9 @@ public class EventStore {
             Long id = eventObj.getJsonNumber("id").longValue();
             if (PlayerCreated.class.getName().equals(name)) {
                 PlayerCreated event = new PlayerCreated(id);
+                events.add(event);
+            } else if (PlayerDeleted.class.getName().equals(name)) {
+                PlayerDeleted event = new PlayerDeleted(id);
                 events.add(event);
             } else if (PlayerFirstNameChanged.class.getName().equals(name)) {
                 String firstName = eventObj.getString("firstName");

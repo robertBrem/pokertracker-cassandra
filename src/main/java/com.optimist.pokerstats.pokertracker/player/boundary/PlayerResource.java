@@ -83,6 +83,14 @@ public class PlayerResource {
     }
 
     @RolesAllowed("admin")
+    @DELETE
+    @Path("{id}")
+    public void delete(@Suspended AsyncResponse response, @PathParam("id") Long id) {
+        service.delete(id);
+        response.resume(Response.noContent().build());
+    }
+
+    @RolesAllowed("admin")
     @POST
     @Path("{id}/accountpositions")
     public void createAccountPoisition(@Suspended AsyncResponse response, @Context UriInfo info, @PathParam("id") Long id, AccountPosition position) {

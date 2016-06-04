@@ -10,4 +10,8 @@ import java.util.List;
 public class EventStream {
     private final Long version;
     private final List<CoreEvent> events;
+
+    public boolean isEmpty() {
+        return events == null || events.isEmpty();
+    }
 }

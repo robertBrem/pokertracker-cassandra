@@ -2,12 +2,10 @@ package com.optimist.pokerstats.pokertracker.player.entity;
 
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
+import com.optimist.pokerstats.pokertracker.player.events.PlayerDeleted;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerFirstNameChanged;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerLastNameChanged;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,6 +13,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(of = {"id"})
 @XmlAccessorType(XmlAccessType.FIELD)
 @NoArgsConstructor
 @Getter
@@ -44,6 +43,10 @@ public class Player {
 
     public void create(Long id) {
         apply(new PlayerCreated(id));
+    }
+
+    public void delete() {
+        apply(new PlayerDeleted(id));
     }
 
     public void mutate(CoreEvent event) {
