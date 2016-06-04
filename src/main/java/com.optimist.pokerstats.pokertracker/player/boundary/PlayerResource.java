@@ -5,6 +5,9 @@ import com.optimist.pokerstats.pokertracker.account.boundary.AccountService;
 import com.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import com.optimist.pokerstats.pokertracker.player.entity.Player;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -19,6 +22,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
+@PermitAll
+@Stateless
 @Path("players")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -41,6 +46,7 @@ public class PlayerResource {
                 .thenAccept(response::resume);
     }
 
+    @RolesAllowed("admin")
     @POST
     public void save(@Suspended AsyncResponse response, @Context UriInfo info, Player player) {
         Player saved = service.create();
@@ -61,6 +67,7 @@ public class PlayerResource {
         response.resume(service.find(id));
     }
 
+    @RolesAllowed("admin")
     @PUT
     @Path("{id}")
     public void update(@Suspended AsyncResponse response, @Context UriInfo info, @PathParam("id") Long id, Player player) {
@@ -75,6 +82,7 @@ public class PlayerResource {
         response.resume(Response.ok(uri).entity(player).build());
     }
 
+    @RolesAllowed("admin")
     @POST
     @Path("{id}/accountpositions")
     public void createAccountPoisition(@Suspended AsyncResponse response, @Context UriInfo info, @PathParam("id") Long id, AccountPosition position) {
