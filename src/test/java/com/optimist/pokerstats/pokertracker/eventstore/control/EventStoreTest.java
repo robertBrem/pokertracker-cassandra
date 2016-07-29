@@ -8,9 +8,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class EventStoreTest {
 
@@ -26,7 +24,7 @@ public class EventStoreTest {
         String given = "[ "
                 + "{ \"name\": \"com.optimist.pokerstats.pokertracker.player.events.PlayerFirstNameChanged\", "
                 + "\"id\": 2,  \"firstName\": \"Robert\"  } "
-        + "]";
+                + "]";
 
         List<CoreEvent> events = store.convertToEvents(given);
 
