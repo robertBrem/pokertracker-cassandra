@@ -59,8 +59,7 @@ public class InMemoryCache {
         }
 
         CompletableFuture
-                .runAsync(this::handleKafkaEvent, kafka)
-                .thenAccept(System.out::println);
+                .runAsync(this::handleKafkaEvent, kafka);
     }
 
     public void handleKafkaEvent() {
