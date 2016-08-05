@@ -65,7 +65,7 @@ public class InMemoryCache {
 
     public void handleKafkaEvent() {
         while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(200);
+            ConsumerRecords<String, String> records = consumer.poll(20);
             for (ConsumerRecord<String, String> record : records) {
                 switch (record.topic()) {
                     case KafkaProvider.TOPIC:

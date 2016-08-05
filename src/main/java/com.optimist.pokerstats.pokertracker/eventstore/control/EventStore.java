@@ -47,7 +47,7 @@ public class EventStore {
 
         producer.send(new ProducerRecord<String, String>(
                 KafkaProvider.TOPIC,
-                String.format("{\"type\":\"test\", \"t\":%.3f}", System.nanoTime() * 1e-9)));
+                convertToJson(events).toString()));
     }
 
     public EventStream loadEventStream(String name) {
@@ -89,46 +89,51 @@ public class EventStore {
     public JsonArray convertToJson(List<CoreEvent> events) {
         JsonArrayBuilder eventArray = Json.createArrayBuilder();
         for (CoreEvent event : events) {
-            JsonObjectBuilder jsonEvent = Json.createObjectBuilder()
-                    .add("name", event.getClass().getName())
-                    .add("id", event.getId());
-            if (event instanceof PlayerCreated) {
-                // no more to do
-            } else if (event instanceof PlayerDeleted) {
-                // no more to do
-            } else if (event instanceof PlayerFirstNameChanged) {
-                PlayerFirstNameChanged changedEvent = (PlayerFirstNameChanged) event;
-                jsonEvent = jsonEvent
-                        .add("firstName", changedEvent.getFirstName());
-            } else if (event instanceof PlayerLastNameChanged) {
-                PlayerLastNameChanged changedEvent = (PlayerLastNameChanged) event;
-                jsonEvent = jsonEvent
-                        .add("lastName", changedEvent.getLastName());
-            } else if (event instanceof AccountPositionCreated) {
-                // no more to do
-            } else if (event instanceof AccountPositionPlayerIdChanged) {
-                AccountPositionPlayerIdChanged changedEvent = (AccountPositionPlayerIdChanged) event;
-                jsonEvent = jsonEvent
-                        .add("playerId", changedEvent.getPlayerId());
-            } else if (event instanceof AccountPositionAmountChanged) {
-                AccountPositionAmountChanged changedEvent = (AccountPositionAmountChanged) event;
-                jsonEvent = jsonEvent
-                        .add("amount", changedEvent.getAmount());
-            } else if (event instanceof AccountPositionCurrencyChanged) {
-                AccountPositionCurrencyChanged changedEvent = (AccountPositionCurrencyChanged) event;
-                jsonEvent = jsonEvent
-                        .add("currency", changedEvent.getCurrency());
-            } else if (event instanceof AccountPositionCreationDateChanged) {
-                AccountPositionCreationDateChanged changedEvent = (AccountPositionCreationDateChanged) event;
-                jsonEvent = jsonEvent
-                        .add("creationDate", changedEvent.getCreationDate().toString());
-            } else {
-                throw new NotImplementedException();
-            }
+            JsonObjectBuilder jsonEvent = convertToJson(event);
             eventArray.add(jsonEvent);
         }
 
         return eventArray.build();
+    }
+
+    public JsonObjectBuilder convertToJson(CoreEvent event) {
+        JsonObjectBuilder jsonEvent = Json.createObjectBuilder()
+                .add("name", event.getClass().getName())
+                .add("id", event.getId());
+        if (event instanceof PlayerCreated) {
+            // no more to do
+        } else if (event instanceof PlayerDeleted) {
+            // no more to do
+        } else if (event instanceof PlayerFirstNameChanged) {
+            PlayerFirstNameChanged changedEvent = (PlayerFirstNameChanged) event;
+            jsonEvent = jsonEvent
+                    .add("firstName", changedEvent.getFirstName());
+        } else if (event instanceof PlayerLastNameChanged) {
+            PlayerLastNameChanged changedEvent = (PlayerLastNameChanged) event;
+            jsonEvent = jsonEvent
+                    .add("lastName", changedEvent.getLastName());
+        } else if (event instanceof AccountPositionCreated) {
+            // no more to do
+        } else if (event instanceof AccountPositionPlayerIdChanged) {
+            AccountPositionPlayerIdChanged changedEvent = (AccountPositionPlayerIdChanged) event;
+            jsonEvent = jsonEvent
+                    .add("playerId", changedEvent.getPlayerId());
+        } else if (event instanceof AccountPositionAmountChanged) {
+            AccountPositionAmountChanged changedEvent = (AccountPositionAmountChanged) event;
+            jsonEvent = jsonEvent
+                    .add("amount", changedEvent.getAmount());
+        } else if (event instanceof AccountPositionCurrencyChanged) {
+            AccountPositionCurrencyChanged changedEvent = (AccountPositionCurrencyChanged) event;
+            jsonEvent = jsonEvent
+                    .add("currency", changedEvent.getCurrency());
+        } else if (event instanceof AccountPositionCreationDateChanged) {
+            AccountPositionCreationDateChanged changedEvent = (AccountPositionCreationDateChanged) event;
+            jsonEvent = jsonEvent
+                    .add("creationDate", changedEvent.getCreationDate().toString());
+        } else {
+            throw new NotImplementedException();
+        }
+        return jsonEvent;
     }
 
     public List<CoreEvent> convertToEvents(String jsonAsString) {
