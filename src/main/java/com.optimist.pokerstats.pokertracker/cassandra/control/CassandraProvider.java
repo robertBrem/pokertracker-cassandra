@@ -1,4 +1,4 @@
-package com.optimist.pokerstats.pokertracker.cassandra.boundary;
+package com.optimist.pokerstats.pokertracker.cassandra.control;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;

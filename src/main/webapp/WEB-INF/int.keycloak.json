@@ -1,0 +1,8 @@
+{
+  "realm": "pokerstats",
+  "realm-public-key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhIrFUCexCsaKp93MYkWykjZRjz1QAf/gNiz3kvKjdXY7WgfBenciDL7NugmnjMSwdhgUp1v4kpnhO7Dnwh2PU/J3tHOPFwMKOjaRH4k/n857v+x1qmcRBQ/whm6km5xqfer3aopYXtgag+mmlDF72oUT7Zc19FPKTf/VCHOtZJRIAMah3MxMoakG5fxNKoT37cixUuieMbSYxct/cB7bWPCOoY5ULkTE8kGHVZa9d0ER5jmgwDaIlyijCWLi2a3y1Pr3iyUNCBWgazwhR86pFezJU9/ABjFr5xQjL1BPn86QMBop7j6pJZ6CJj+3VMzYYe1Ar+Mp4s9rgVikCvjFBQIDAQAB",
+  "bearer-only": true,
+  "auth-server-url": "https://5.189.172.129:8443/auth",
+  "ssl-required": "none",
+  "resource": "pokertracker"
+}

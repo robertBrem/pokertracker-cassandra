@@ -40,6 +40,11 @@
             <version>0.0.4</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>0.10.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
@@ -69,6 +74,24 @@
                             <backend>swagger</backend>
                             <!-- Domain of the deployed project, defaults to example.com -->
                             <deployedDomain>localhost:8080/pokertracker</deployedDomain>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <executions>
+                    <execution>
+                        <id>rename-file</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>src/main/webapp/WEB-INF/${env.STAGE}.keycloak.json</sourceFile>
+                            <destinationFile>src/main/webapp/WEB-INF/keycloak.json</destinationFile>
                         </configuration>
                     </execution>
                 </executions>

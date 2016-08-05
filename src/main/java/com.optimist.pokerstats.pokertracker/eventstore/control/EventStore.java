@@ -3,10 +3,13 @@ package com.optimist.pokerstats.pokertracker.eventstore.control;
 import com.optimist.pokerstats.pokertracker.account.events.*;
 import com.optimist.pokerstats.pokertracker.eventstore.entity.DataWithVersion;
 import com.optimist.pokerstats.pokertracker.eventstore.entity.EventIdentity;
+import com.optimist.pokerstats.pokertracker.kafka.control.KafkaProvider;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerDeleted;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerFirstNameChanged;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerLastNameChanged;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.enterprise.event.Event;
@@ -28,6 +31,9 @@ public class EventStore {
     @Inject
     Event<CoreEvent> eventChannel;
 
+    @Inject
+    KafkaProducer<String, String> producer;
+
     public void appendToStream(EventIdentity id, Long originalVersion, List<CoreEvent> events) {
         if (events == null || events.isEmpty()) {
             return;
@@ -38,6 +44,10 @@ public class EventStore {
 
         events.stream()
                 .forEach(e -> eventChannel.fire(e));
+
+        producer.send(new ProducerRecord<String, String>(
+                KafkaProvider.TOPIC,
+                String.format("{\"type\":\"test\", \"t\":%.3f}", System.nanoTime() * 1e-9)));
     }
 
     public EventStream loadEventStream(String name) {
