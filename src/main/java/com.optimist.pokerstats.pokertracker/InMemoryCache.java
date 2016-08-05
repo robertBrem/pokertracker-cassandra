@@ -7,6 +7,7 @@ import com.optimist.pokerstats.pokertracker.account.events.AccountPositionEvent;
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStore;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStream;
+import com.optimist.pokerstats.pokertracker.eventstore.control.JsonConverter;
 import com.optimist.pokerstats.pokertracker.kafka.control.KafkaProvider;
 import com.optimist.pokerstats.pokertracker.player.entity.Player;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
@@ -20,10 +21,10 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -47,6 +48,9 @@ public class InMemoryCache {
     @Inject
     ExecutorService kafka;
 
+    @Inject
+    JsonConverter converter;
+
     @PostConstruct
     public void onInit() {
         EventStream eventStream = store.loadEventStream(Player.class.getName());
@@ -69,16 +73,16 @@ public class InMemoryCache {
                 switch (record.topic()) {
                     case KafkaProvider.TOPIC:
                         System.out.println("record.value() = " + record.value());
+                        List<CoreEvent> events = converter.convertToEvents(record.value());
+                        for (CoreEvent event : events) {
+                            handle(event);
+                        }
                         break;
                     default:
                         throw new IllegalArgumentException("Illegal message type: ");
                 }
             }
         }
-    }
-
-    public void handleEvent(@Observes CoreEvent event) {
-        handle(event);
     }
 
     public void handle(CoreEvent event) {

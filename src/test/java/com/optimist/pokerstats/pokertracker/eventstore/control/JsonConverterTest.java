@@ -10,13 +10,13 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-public class EventStoreTest {
+public class JsonConverterTest {
 
-    private EventStore store;
+    private JsonConverter converter;
 
     @Before
     public void setUpTest() {
-        store = new EventStore();
+        converter = new JsonConverter();
     }
 
     @Test
@@ -26,7 +26,7 @@ public class EventStoreTest {
                 + "\"id\": 2,  \"firstName\": \"Robert\"  } "
                 + "]";
 
-        List<CoreEvent> events = store.convertToEvents(given);
+        List<CoreEvent> events = converter.convertToEvents(given);
 
         assertThat(events, is(notNullValue()));
         assertFalse(events.isEmpty());
