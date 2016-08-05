@@ -1,16 +1,21 @@
 package com.optimist.pokerstats.pokertracker;
 
+import com.airhacks.porcupine.execution.boundary.Dedicated;
 import com.optimist.pokerstats.pokertracker.account.entity.AccountPosition;
 import com.optimist.pokerstats.pokertracker.account.events.AccountPositionCreated;
 import com.optimist.pokerstats.pokertracker.account.events.AccountPositionEvent;
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStore;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStream;
+import com.optimist.pokerstats.pokertracker.kafka.control.KafkaProvider;
 import com.optimist.pokerstats.pokertracker.player.entity.Player;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerDeleted;
 import com.optimist.pokerstats.pokertracker.player.events.PlayerEvent;
 import lombok.Getter;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +25,8 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 @Singleton
 public class InMemoryCache {
@@ -33,6 +40,13 @@ public class InMemoryCache {
     @Inject
     EventStore store;
 
+    @Inject
+    KafkaConsumer<String, String> consumer;
+
+    @Dedicated
+    @Inject
+    ExecutorService kafka;
+
     @PostConstruct
     public void onInit() {
         EventStream eventStream = store.loadEventStream(Player.class.getName());
@@ -42,6 +56,25 @@ public class InMemoryCache {
         eventStream = store.loadEventStream(AccountPosition.class.getName());
         for (CoreEvent event : eventStream.getEvents()) {
             handle(event);
+        }
+
+        CompletableFuture
+                .runAsync(this::handleKafkaEvent, kafka)
+                .thenAccept(System.out::println);
+    }
+
+    public void handleKafkaEvent() {
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(200);
+            for (ConsumerRecord<String, String> record : records) {
+                switch (record.topic()) {
+                    case KafkaProvider.TOPIC:
+                        System.out.println("record.value() = " + record.value());
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Illegal message type: ");
+                }
+            }
         }
     }
 
