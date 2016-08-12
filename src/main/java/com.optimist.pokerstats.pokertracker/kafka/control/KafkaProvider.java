@@ -9,8 +9,6 @@ import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.enterprise.inject.Produces;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -40,33 +38,23 @@ public class KafkaProvider {
     }
 
     public KafkaConsumer<String, String> createConsumer() {
-        Properties properties = getProperties("consumer.props");
+        Properties properties = new Properties();
+        properties.put("bootstrap.servers", "172.17.0.1:9092");
+        properties.put("group.id", "pokertracker");
+        properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(Arrays.asList(TOPIC));
         return consumer;
     }
 
     public KafkaProducer<String, String> createProducer() {
-        Properties properties = getProperties("producer.props");
-        return new KafkaProducer<>(properties);
-    }
-
-    public Properties getProperties(String file) {
-        InputStream props = getFileStream(file);
         Properties properties = new Properties();
-        try {
-            properties.load(props);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
-        return properties;
-    }
-
-    public InputStream getFileStream(String file) {
-        return Thread
-                .currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(file);
+        properties.put("bootstrap.servers", "172.17.0.1:9092");
+        properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        return new KafkaProducer<>(properties);
     }
 
 }
