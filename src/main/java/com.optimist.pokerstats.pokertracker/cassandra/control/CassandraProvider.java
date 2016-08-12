@@ -9,13 +9,12 @@ import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
 import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class CassandraProvider {
-    public static final String CASSANDRA_IP = "CASSANDRA_IP";
+    public static final String CASSANDRA_ADDRESS = "CASSANDRA_ADDRESS";
     public static final String KEYSPACE = "pokertracker";
 
     @Inject
@@ -25,19 +24,19 @@ public class CassandraProvider {
 
     @PostConstruct
     public void init() {
-        String serverIP = "localhost";
-        String cassandraEnv = envGetter.getEnv(CASSANDRA_IP);
+        String address = "localhost";
+        String cassandraEnv = envGetter.getEnv(CASSANDRA_ADDRESS);
         if (cassandraEnv != null && !cassandraEnv.isEmpty()) {
-            serverIP = cassandraEnv;
+            address = cassandraEnv;
         }
         Cluster cluster = Cluster.builder()
-                .addContactPoints(serverIP)
+                .addContactPoints(address)
                 .build();
         session = cluster.connect(KEYSPACE);
     }
 
     @Produces
-    public Session getSession(InjectionPoint ip) {
+    public Session getSession() {
         return session;
     }
 
