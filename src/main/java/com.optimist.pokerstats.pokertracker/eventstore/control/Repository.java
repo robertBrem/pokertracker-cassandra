@@ -103,7 +103,8 @@ public class Repository {
                     .get();
         }
         if (!version.equals(expectedVersion)) {
-            throw new RuntimeException("AppendConcurrentException, version does not match!");
+            throw new RuntimeException("AppendConcurrentException, version does not match! version: " + version
+                    + " expectedVersion: " + expectedVersion);
         }
         Long newVersion = version + 1;
         String insertSql = "insert into EVENTS (ID, NAME, VERSION, DATE, DATA)" +

@@ -1,7 +1,6 @@
 package com.optimist.pokerstats.pokertracker.kafka.control;
 
 
-import com.google.common.io.Resources;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 
@@ -64,11 +63,10 @@ public class KafkaProvider {
     }
 
     public InputStream getFileStream(String file) {
-        try {
-            return Resources.getResource(file).openStream();
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return Thread
+                .currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream(file);
     }
 
 }
