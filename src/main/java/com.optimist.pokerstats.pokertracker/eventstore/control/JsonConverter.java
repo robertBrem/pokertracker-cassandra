@@ -1,10 +1,10 @@
 package com.optimist.pokerstats.pokertracker.eventstore.control;
 
-import com.optimist.pokerstats.pokertracker.account.events.*;
-import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
-import com.optimist.pokerstats.pokertracker.player.events.PlayerDeleted;
-import com.optimist.pokerstats.pokertracker.player.events.PlayerFirstNameChanged;
-import com.optimist.pokerstats.pokertracker.player.events.PlayerLastNameChanged;
+import com.optimist.pokerstats.pokertracker.account.event.*;
+import com.optimist.pokerstats.pokertracker.player.event.PlayerCreated;
+import com.optimist.pokerstats.pokertracker.player.event.PlayerDeleted;
+import com.optimist.pokerstats.pokertracker.player.event.PlayerFirstNameChanged;
+import com.optimist.pokerstats.pokertracker.player.event.PlayerLastNameChanged;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.json.*;

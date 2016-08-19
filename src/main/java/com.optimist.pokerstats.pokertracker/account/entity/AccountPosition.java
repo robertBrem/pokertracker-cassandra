@@ -1,7 +1,7 @@
 package com.optimist.pokerstats.pokertracker.account.entity;
 
 import com.optimist.pokerstats.pokertracker.LocalDateTimeAdapter;
-import com.optimist.pokerstats.pokertracker.account.events.*;
+import com.optimist.pokerstats.pokertracker.account.event.*;
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
 import lombok.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;

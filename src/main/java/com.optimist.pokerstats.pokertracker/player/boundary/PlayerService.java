@@ -1,6 +1,6 @@
 package com.optimist.pokerstats.pokertracker.player.boundary;
 
-import com.optimist.pokerstats.pokertracker.InMemoryCache;
+import com.optimist.pokerstats.pokertracker.eventstore.boundary.EventRepository;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStore;
 import com.optimist.pokerstats.pokertracker.eventstore.control.EventStream;
 import com.optimist.pokerstats.pokertracker.eventstore.entity.EventIdentity;
@@ -8,9 +8,7 @@ import com.optimist.pokerstats.pokertracker.player.entity.Player;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.ws.rs.core.GenericEntity;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 
 @Stateless
@@ -20,27 +18,14 @@ public class PlayerService {
     EventStore store;
 
     @Inject
-    InMemoryCache cache;
-
-    public GenericEntity<Set<Player>> findAllAsGenericEntities() {
-        return new GenericEntity<Set<Player>>(findAll()) {
-        };
-    }
-
-    public Set<Player> findAll() {
-        return new HashSet<>(cache.getPlayers().values());
-    }
-
-    public Player find(Long id) {
-        return cache.getPlayers().get(id);
-    }
+    EventRepository repository;
 
     public Player create() {
-        // TODO
-        Set<Long> playerIds = cache.getPlayers().keySet();
+        Set<Player> players = repository.findAllPlayers();
         Long maxId = 0L;
-        if (!playerIds.isEmpty()) {
-            maxId = playerIds.stream()
+        if (!players.isEmpty()) {
+            maxId = players.parallelStream()
+                    .map(Player::getId)
                     .max(Long::compareTo)
                     .get();
         }

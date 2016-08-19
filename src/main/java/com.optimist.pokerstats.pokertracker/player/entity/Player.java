@@ -1,10 +1,10 @@
 package com.optimist.pokerstats.pokertracker.player.entity;
 
 import com.optimist.pokerstats.pokertracker.eventstore.control.CoreEvent;
-import com.optimist.pokerstats.pokertracker.player.events.PlayerCreated;
-import com.optimist.pokerstats.pokertracker.player.events.PlayerDeleted;
-import com.optimist.pokerstats.pokertracker.player.events.PlayerFirstNameChanged;
-import com.optimist.pokerstats.pokertracker.player.events.PlayerLastNameChanged;
+import com.optimist.pokerstats.pokertracker.player.event.PlayerCreated;
+import com.optimist.pokerstats.pokertracker.player.event.PlayerDeleted;
+import com.optimist.pokerstats.pokertracker.player.event.PlayerFirstNameChanged;
+import com.optimist.pokerstats.pokertracker.player.event.PlayerLastNameChanged;
 import lombok.*;
 
 import javax.xml.bind.annotation.XmlAccessType;

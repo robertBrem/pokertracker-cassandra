@@ -1,4 +1,4 @@
-package com.optimist.pokerstats.pokertracker.account.events;
+package com.optimist.pokerstats.pokertracker.account.event;
 
 
 import lombok.Getter;

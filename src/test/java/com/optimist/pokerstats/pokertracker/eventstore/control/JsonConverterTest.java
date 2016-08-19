@@ -1,7 +1,7 @@
 package com.optimist.pokerstats.pokertracker.eventstore.control;
 
 
-import com.optimist.pokerstats.pokertracker.player.events.PlayerFirstNameChanged;
+import com.optimist.pokerstats.pokertracker.player.event.PlayerFirstNameChanged;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class JsonConverterTest {
     @Test
     public void convertToEventsHappyPath() {
         String given = "[ "
-                + "{ \"name\": \"com.optimist.pokerstats.pokertracker.player.events.PlayerFirstNameChanged\", "
+                + "{ \"name\": \"com.optimist.pokerstats.pokertracker.player.event.PlayerFirstNameChanged\", "
                 + "\"id\": 2,  \"firstName\": \"Robert\"  } "
                 + "]";
 
