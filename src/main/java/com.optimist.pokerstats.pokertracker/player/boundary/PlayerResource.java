@@ -50,7 +50,32 @@ public class PlayerResource {
         }
         long id = saved.getId();
         URI uri = info.getAbsolutePathBuilder().path("/" + id).build();
-        response.resume(Response.created(setUriPort(uri, 8383)).entity(saved).build());
+        response.resume(Response.created(updatePath(uri)).entity(saved).build());
+    }
+
+    public URI updatePath(URI uri) {
+        URI newUri = setUriPort(uri, 8383);
+        newUri = setFirstPathElement(newUri, "pokertracker-query");
+        return newUri;
+    }
+
+    public URI setFirstPathElement(URI uri, String firstPathElement) {
+        String path = uri.getPath();
+        String[] pathElements = path.split("/");
+        if (pathElements.length < 2) {
+            return uri;
+        }
+
+        pathElements[1] = firstPathElement;
+        String newPath = "";
+        for (String pathElement : pathElements) {
+            newPath += pathElement + "/";
+        }
+        try {
+            return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), newPath, uri.getQuery(), uri.getFragment());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public URI setUriPort(URI uri, int port) {
@@ -101,7 +126,7 @@ public class PlayerResource {
             saved = accountPositionService.changeCurrency(possitionId, position.getCurrency());
         }
         URI uri = info.getAbsolutePathBuilder().path("/" + possitionId).build();
-        response.resume(Response.created(setUriPort(uri, 8383)).entity(saved).build());
+        response.resume(Response.created(updatePath(uri)).entity(saved).build());
     }
 
 }
