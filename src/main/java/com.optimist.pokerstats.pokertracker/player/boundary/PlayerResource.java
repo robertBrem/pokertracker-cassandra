@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 
@@ -49,7 +50,15 @@ public class PlayerResource {
         }
         long id = saved.getId();
         URI uri = info.getAbsolutePathBuilder().path("/" + id).build();
-        response.resume(Response.created(uri).entity(saved).build());
+        response.resume(Response.created(setUriPort(uri, 8383)).entity(saved).build());
+    }
+
+    public URI setUriPort(URI uri, int port) {
+        try {
+            return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), port, uri.getPath(), uri.getQuery(), uri.getFragment());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @RolesAllowed("admin")
@@ -92,7 +101,7 @@ public class PlayerResource {
             saved = accountPositionService.changeCurrency(possitionId, position.getCurrency());
         }
         URI uri = info.getAbsolutePathBuilder().path("/" + possitionId).build();
-        response.resume(Response.created(uri).entity(saved).build());
+        response.resume(Response.created(setUriPort(uri, 8383)).entity(saved).build());
     }
 
 }
