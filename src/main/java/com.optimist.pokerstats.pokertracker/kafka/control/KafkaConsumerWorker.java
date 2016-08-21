@@ -85,6 +85,7 @@ public class KafkaConsumerWorker {
 
                         break;
                     default:
+                        System.out.println("topic not know: " + record.topic());
                         throw new IllegalArgumentException("Illegal message type: ");
                 }
             }
